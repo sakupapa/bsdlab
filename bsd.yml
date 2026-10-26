@@ -1,0 +1,53 @@
+name: bsd
+
+topology:
+  nodes:
+    homer:
+      kind: openbsd
+      image: vrnetlab/openbsd_openbsd:7.9
+    pe1:
+      kind: openbsd
+      image: vrnetlab/openbsd_openbsd:7.9
+    p:
+      kind: openbsd
+      image: vrnetlab/openbsd_openbsd:7.9
+    pe2:
+      kind: openbsd
+      image: vrnetlab/openbsd_openbsd:7.9
+    ix:
+      kind: openbsd
+      image: vrnetlab/openbsd_openbsd:7.9
+    pc:
+      kind: linux
+      image: chrome:1.0
+      ports:
+        - 5900:5900
+      exec:
+        - ip link set dev eth0 down
+    www:
+      kind: linux
+      image: nginx:1.0
+      ports:
+        - 8080:80
+      exec:
+        - ip link set dev eth0 down
+        - ip addr add 1.0.0.1/24 dev eth1
+        - ip route add default via 1.0.0.254
+    dns:
+      kind: linux
+      image: coredns/coredns:latest
+      binds:
+        - ./Corefile:/Corefile
+      cmd: -conf /Corefile
+      exec:
+        - ip link set dev eth0 down
+        - ip addr add 100.0.0.1/24 dev eth1
+        - ip route add default via 100.0.0.254
+  links:
+    - endpoints: [ "pc:eth1", "homer:eth1" ]
+    - endpoints: [ "homer:eth2", "pe1:eth1" ]
+    - endpoints: [ "pe1:eth2", "p:eth1" ]
+    - endpoints: [ "p:eth2", "pe2:eth1" ]
+    - endpoints: [ "pe2:eth2", "ix:eth1" ]
+    - endpoints: [ "ix:eth2", "www:eth1" ]
+    - endpoints: [ "ix:eth3", "dns:eth1" ]
