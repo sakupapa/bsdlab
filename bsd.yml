@@ -33,16 +33,6 @@ topology:
         - ip link set dev eth0 down
         - ip addr add 1.0.0.1/24 dev eth1
         - ip route add default via 1.0.0.254
-    dns:
-      kind: linux
-      image: coredns/coredns:latest
-      binds:
-        - ./Corefile:/Corefile
-      cmd: -conf /Corefile
-      exec:
-        - ip link set dev eth0 down
-        - ip addr add 100.0.0.1/24 dev eth1
-        - ip route add default via 100.0.0.254
   links:
     - endpoints: [ "pc:eth1", "homer:eth1" ]
     - endpoints: [ "homer:eth2", "pe1:eth1" ]
@@ -50,4 +40,3 @@ topology:
     - endpoints: [ "p:eth2", "pe2:eth1" ]
     - endpoints: [ "pe2:eth2", "ix:eth1" ]
     - endpoints: [ "ix:eth2", "www:eth1" ]
-    - endpoints: [ "ix:eth3", "dns:eth1" ]
